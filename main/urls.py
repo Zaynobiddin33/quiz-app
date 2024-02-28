@@ -15,4 +15,5 @@ urlpatterns = [
     #auth
     path('login', views.logging_in, name = 'login'),
     path('register', views.register, name = 'register'),
+
 ]

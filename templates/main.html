@@ -6,7 +6,7 @@
           
           <div class="row d-flex justify-content-center">
             <h1 class="col-12" style="text-align: center;">All quizes you've created</h1>
-          {%for quiz in quizes%}
+          {% for quiz in quizes %}
          
           <div class="card card-danger col-5 m-2">
             <div class="card-header">
@@ -20,7 +20,8 @@
             </div>
             <div class="card-body">
             </div>
-              <p>Contains {{quiz.all_questions}} question(s) overall</p>
+            <p>Contains {{quiz.all_questions}} question(s) overall</p>
+            <h4><a href="{% url 'front:quiz_detail' quiz.code %}">link</a>
             </div>
 
           {%endfor%}

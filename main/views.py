@@ -13,45 +13,46 @@ def main(request):
     }
     return render(request, 'main.html', context)
 
+
 @login_required(login_url = 'dash:login')
 def create_quiz(request):
     if request.method == 'POST':
         title = request.POST['title']
-        user = request.user
         quiz = Quiz.objects.create(
             title = title,
-            author = user
+            author = request.user
         )
         return redirect('dash:quest_create', quiz.id)
     return render(request, 'quiz/create-quiz.html')
 
+
 @login_required(login_url = 'dash:login')
 def create_question(request, id):
+    print(request.POST)
+
     quiz = Quiz.objects.get(id = id)
     if request.method == 'POST':
-        
         title = request.POST['title']
         ques = Question.objects.create(
             quiz = quiz,
             title = title
         )
-        quest = Question.objects.get(id = ques.id)
         Option.objects.create(
-            question = quest,
+            question = ques,
             name = request.POST['correct'],
             is_correct = True
         )
-        data = [request.POST['incorrect1'], request.POST['incorrect2'], request.POST['incorrect3']]
-
-        for i in data:
+        for i in range(int(request.POST['input-count'])):
+            string = 'incorrect' + str(i)
             Option.objects.create(
-                question = quest,
-                name = i,
+                question = ques,
+                name = request.POST[string]
             )
         if request.POST['submit_action'] == 'exit':
             return redirect('dash:main')
+            
+    return render (request, 'quiz/create-question.html')
 
-    return render (request, 'quiz/create-question.html' )
 
 @login_required(login_url = 'dash:login')
 def questions_list(request, id):
@@ -80,11 +81,9 @@ def quest_detail(request, id):
 
         data = [request.POST['incorrect1'], request.POST['incorrect2'], request.POST['incorrect3']]
 
-        counter = 0
-        for opt in options:
-            opt.name = data[counter]
+        for i, opt in enumerate(options):
+            opt.name = data[i]
             opt.save()
-            counter+=1
     return render( request, 'details/detail.html', context)
 
 @login_required(login_url = 'dash:login')
@@ -100,7 +99,7 @@ def logging_in(request):
     if request.method == 'POST':
         username = request.POST['username']
         password =  request.POST['password']
-        user = authenticate(username = username)
+        user = authenticate(username = username, password=password)
         if user:
             login(request, user)
             return redirect('dash:main')

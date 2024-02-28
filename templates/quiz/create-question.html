@@ -1,86 +1,135 @@
-{%extends 'base.html'%}
-  {%block content%}
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .input-group {
+        margin-bottom: 10px; /* Add margin bottom to create space between input groups */
+    }
 
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-3 col-xl-3"></div>
-            <div class="card col-xl-6 col-lg-6 " id="sample-login">
-                <form method = 'post'> {%csrf_token%}
+    .input-group .form-control {
+        margin-right: 10px; /* Add margin right to create space between input fields */
+    }
+</style>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-3 col-xl-3"></div>
+        <div class="card col-xl-6 col-lg-6" id="sample-login">
+            <form method="post">
+                {% csrf_token %}
                 <div class="card-header justify-content-center d-flex">
                     <h4>Question</h4>
                 </div>
                 <div class="card-body pb-0">
                     <div class="form-group">
-                    <label>write down a question</label>
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                        <div class="input-group-text">
-                            <i class="fa-solid fa-question"></i>
-                        </div>
-                        </div>
-                        <input type="text" class="form-control" placeholder="Quiz name" name = 'title'>
-                    </div>
-                    </div>
-                    <br>
-                    <div class="form-group">
-                        <h6 style="text-align: center;">write down correct answers</h6>
-                        <label for="#">give a correct answer for that field, and we randomly place the answer for each test takers.</label>
+                        <label>Write down a question</label>
                         <div class="input-group">
                             <div class="input-group-prepend">
-                            <div class="input-group-text">
-                                <i class="fa-solid fa-check"></i>
+                                <div class="input-group-text">
+                                    <i class="fa-solid fa-question"></i>
+                                </div>
                             </div>
-                            </div>
-                            <input type="text" class="form-control" placeholder="Correct answer for the question " name="correct">
+                            <input type="text" class="form-control" placeholder="Quiz name" name="title">
                         </div>
                     </div>
                     <br>
                     <div class="form-group">
-                        <h6 style="text-align: center;">Give 3 wrong answers</h6>
+                        <h6 style="text-align: center;">Write down correct answers</h6>
+                        <label for="#">Give a correct answer for that field, and we randomly place the answer for each test taker.</label>
                         <div class="input-group">
                             <div class="input-group-prepend">
-                            <div class="input-group-text">
-                                <i class="fa-regular fa-circle-xmark"></i>
+                                <div class="input-group-text">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
                             </div>
-                            </div>
-                            <input type="text" class="form-control" placeholder="1st Wrong answer for the question " name = 'incorrect1'>
+                            <input type="text" class="form-control" placeholder="Correct answer for the question" name="correct">
                         </div>
                     </div>
+                    <br>
+                    <h6 style="text-align: center;">Give wrong answers</h6>
                     <div class="form-group">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                            <div class="input-group-text">
-                                <i class="fa-regular fa-circle-xmark"></i>
+                        <div id="inputs-container">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <i class="fa-regular fa-circle-xmark"></i>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" placeholder="1st Wrong answer for the question" name="incorrect0">
+                                <button type="button" class="add-input btn btn-primary">Add Input</button>
                             </div>
-                            </div>
-                            <input type="text" class="form-control" placeholder="2nd Wrong answer for the question " name="incorrect2">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                            <div class="input-group-text">
-                                <i class="fa-regular fa-circle-xmark"></i>
-                            </div>
-                            </div>
-                            <input type="text" class="form-control" placeholder="3rd Wrong answer for the question " name = 'incorrect3'>
                         </div>
                     </div>
                     <div class="form-group mb-0">
+                        <input type="hidden" id="input-count" name="input-count" value="1">
                     </div>
                     <div class="card-footer  justify-content-left d-flex">
                         <div class="col-6">
-                            <button  type="submit" name="submit_action" value="exit" class="btn btn-danger">Save & Exit</button>
+                            <button type="submit" name="submit_action" value="exit" class="btn btn-danger">Save & Exit</button>
                         </div>
                         <div class="col-6">
                             <button type="submit" name="submit_action" value="save_again" class="btn btn-primary">Save & add question</button>
                         </div>
                     </div>
                 </div>
-                
-                </form>
-            </div>
+            </form>
         </div>
     </div>
+</div>
 
-  {%endblock%}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var inputsContainer = document.getElementById('inputs-container');
+    var inputCount = 1;
+    var inputCountField = document.getElementById('input-count');
+
+    function createInputField() {
+        var inputGroup = document.createElement('div');
+        inputGroup.classList.add('input-group');
+        
+        var prependDiv = document.createElement('div');
+        prependDiv.classList.add('input-group-prepend');
+        
+        var prependTextDiv = document.createElement('div');
+        prependTextDiv.classList.add('input-group-text');
+        
+        var icon = document.createElement('i');
+        icon.classList.add('fa-regular', 'fa-circle-xmark');
+        
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.classList.add('form-control');
+        input.placeholder = 'Wrong answer for the question';
+        input.name = 'incorrect' + inputCount;
+        
+        var deleteButton = document.createElement('button');
+        deleteButton.type = 'button';
+        deleteButton.textContent = 'Delete';
+        deleteButton.classList.add('delete-input', 'btn', 'btn-danger');
+        deleteButton.addEventListener('click', function() {
+            inputsContainer.removeChild(inputGroup);
+            updateInputCount(-1);
+        });
+        
+        prependTextDiv.appendChild(icon);
+        prependDiv.appendChild(prependTextDiv);
+        inputGroup.appendChild(prependDiv);
+        inputGroup.appendChild(input);
+        inputGroup.appendChild(deleteButton);
+        
+        inputsContainer.appendChild(inputGroup);
+        
+        updateInputCount(1);
+    }
+
+    function updateInputCount(count) {
+        inputCount += count;
+        inputCountField.value = inputCount;
+    }
+
+    document.querySelector('.add-input').addEventListener('click', function() {
+        createInputField();
+    });
+});
+</script>
+
+{% endblock %}

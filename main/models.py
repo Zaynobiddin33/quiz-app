@@ -1,3 +1,5 @@
+import random, string
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -5,12 +7,22 @@ from django.contrib.auth.models import User
 class Quiz(models.Model):
     title = models.CharField(max_length=255)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    code = models.CharField(max_length=255, blank=True, unique=True)
 
     @property
     def all_questions(self):
         related = Question.objects.filter(quiz = self).count()
         return related
 
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.code = "".join(
+                random.sample(
+                    string.ascii_letters, 
+                    20
+                )
+            )
+        super(Quiz, self).save(*args, **kwargs)
 
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
@@ -24,6 +36,11 @@ class Question(models.Model):
             data = False
         return data
 
+    @property
+    def get_options(self, *args, **kwargs):
+        options = list(Option.objects.filter(question_id=self.id))
+        random.shuffle(options)
+        return options
 
 class Option(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
