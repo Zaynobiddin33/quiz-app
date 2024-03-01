@@ -73,6 +73,13 @@ class Answer(models.Model):
     answer = models.ForeignKey(Option, on_delete=models.CASCADE)
     is_correct = models.BooleanField()
 
+    def save(self, *args, **kwargs):
+        if self.answer == self.question.correct_answer:
+            self.is_correct = True
+        else:
+            self.is_correct = False
+        super(Answer, self).save(*args, **kwargs)
+
 
 class Result(models.Model):
     taker = models.ForeignKey(QuizTaker, on_delete=models.CASCADE)
@@ -87,4 +94,5 @@ class Result(models.Model):
     
     @property
     def percentage(self, *args, **kwargs):
-        return self.correct_answers / self.questions * 100
+        data = self.correct_answers / self.questions * 100
+        return round(data, 1)

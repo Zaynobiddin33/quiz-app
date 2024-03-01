@@ -22,6 +22,7 @@
             </div>
             <p>Contains {{quiz.all_questions}} question(s) overall</p>
             <h4><a href="{% url 'front:quiz_detail' quiz.code %}">link</a>
+            <h4><a href="{% url 'dash:get_results' quiz.id %}">Results</a>
             </div>
 
           {%endfor%}

@@ -3,6 +3,9 @@ from .models import *
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.http import HttpResponse
+from openpyxl import Workbook
+from io import BytesIO
 
 # Create your views here.
 @login_required(login_url = 'dash:login')
@@ -91,6 +94,33 @@ def quiz_delete(request, id):
     Quiz.objects.get(id = id).delete()
     return redirect('dash:main')
 
+
+@login_required(login_url = 'dash:login')
+def get_results(request, id):
+    quiz = Quiz.objects.get(id=id)
+    taker = QuizTaker.objects.filter(quiz=quiz)
+
+    # results = []
+    # for i in taker:
+    #     results.append(Result.objects.get(taker=i))
+    
+    results = tuple(
+            map(
+            lambda x : Result.objects.get(taker=x),
+            taker
+        )
+    )
+    return render(request, 'quiz/results.html', {'results':results, 'quiz':quiz})
+
+def result_detail(request, id):
+    result = Result.objects.get(id=id)
+    answers = Answer.objects.filter(taker=result.taker)
+    context = {
+        'taker':result.taker,
+        'answers':answers
+    }
+    return render(request, 'quiz/result-detail.html', context)
+
 #login
 
 
@@ -123,3 +153,44 @@ def register(request):
         else:
             status  = f'the username {username} is occupied'
     return render(request, 'auth/register.html', {'status': status})
+
+def success_page(request):
+    return render(request, 'quiz/success.html' )
+
+
+def excel_report(request, id):
+    results = Result.objects.filter(taker__quiz = Quiz.objects.get(id = id)).order_by('-correct_answers')
+    wb = Workbook()
+    wsh = wb.active
+    headers = ['#', 'Full name', "Phone", "Email", "Total Questions", "Correct answers", "Incorrect answers", "Percentage"]
+    wsh.append(headers)
+    for i , result in enumerate(results):
+        if not result.taker.email:
+            email = 'No'
+        else:
+            email = result.taker.email
+        row_data = [i+1, result.taker.full_name, result.taker.phone, email, result.questions, result.correct_answers, result.incorrect_answers, f"{result.percentage}%"]
+        wsh.append(row_data)
+
+    for col in wsh.columns:
+        max_length = 0
+        column = col[0].column_letter
+        for cell in col:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        changed_width = (max_length + 2) * 1.2
+        wsh.column_dimensions[column].width = changed_width
+
+    buffer = BytesIO()
+    wb.save(buffer)
+    buffer.seek(0)
+    response = HttpResponse(
+        buffer.getvalue(),
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename="incomes.xlsx"'
+    return response
+
