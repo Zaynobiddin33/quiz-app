@@ -25,8 +25,6 @@ def create_result(id):
 
 def quiz_detail(request, code):
     quiz = models.Quiz.objects.get(code=code)
-    print(quiz.limited_date)
-    print(timezone.now())
     if quiz.is_active == False:
         return HttpResponse('Inactive')
     elif quiz.limited_date and (timezone.now() < quiz.start_date or quiz.limited_date < timezone.now()):
