@@ -47,8 +47,6 @@ def create_quiz(request):
 
 @login_required(login_url = 'dash:login')
 def create_question(request, id):
-    print(request.POST)
-
     quiz = Quiz.objects.get(id = id)
     if request.method == 'POST':
         title = request.POST['title']
