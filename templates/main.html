@@ -8,21 +8,39 @@
             <h1 class="col-12" style="text-align: center;">All quizes you've created</h1>
           {% for quiz in quizes %}
          
-          <div class="card card-danger col-5 m-2">
+          <div class="card card-danger col-lg-5 col-md-5 col-sm-12 col-12 m-2">
             <div class="card-header">
-              <h4>{{quiz.title}}</h4>
+              <h4 >{{quiz.title}}</h4>
               <div class="card-header-action">
-                <a href="{%url 'dash:questions' quiz.id%}" class="btn btn-primary">View the quiz</a>
-                <div class="dropdown">
-                  <a href="{%url 'dash:quiz_delete' quiz.id%}" class="btn btn-danger">Delete quiz</a>
-                </div>
+               
               </div>
+            </div>
+            
+            <div class="dropdown">
+              <a href="{%url 'dash:questions' quiz.id%}"  class="btn btn-primary col-xs-12 col-sm-3 col-lg-3 m-1">View</a>
+             
+              <a href="{% url 'dash:get_results' quiz.id %}"  class="btn btn-primary col-xs-12 col-sm-3 col-lg-3 m-1">Results</a>
+              <a href="{%url 'dash:quiz_delete' quiz.id%}"  class="btn btn-danger col-xs-12 col-sm-3 col-lg-3 m-1" >Delete</a>
             </div>
             <div class="card-body">
             </div>
             <p>Contains {{quiz.all_questions}} question(s) overall</p>
-            <h4><a href="{% url 'front:quiz_detail' quiz.code %}">link</a>
-            <h4><a href="{% url 'dash:get_results' quiz.id %}">Results</a>
+            {%if quiz.limited_date == None%}
+            <p>Time is not limited for this quiz</p>
+            {%elif quiz.limited_date != None and quiz.is_active == True%}
+            <p>available from {{quiz.start_date}} untill {{quiz.limited_date}}</p>
+            {%elif quiz.is_active == False%}
+            <p>not active</p>
+            {%endif%}
+            <button class="btn btn-dark" value="{{main}}{% url 'front:quiz_detail' quiz.code %}" id = 'copyButton{{forloop.counter}}'>Copy the link to clipboard</button>
+            <br>
+            {%if quiz.is_active == True%}
+            <a href="{%url 'dash:act_deact' quiz.id%}"><button class="btn btn-success">deactivate</button></a>
+            {%else%}
+            <a href="{%url 'dash:act_deact' quiz.id%}"><button class="btn btn-secondary">activate</button></a>
+            {%endif%}
+            <br>
+            
             </div>
 
           {%endfor%}
@@ -119,5 +137,21 @@
             </div>
           </div>
         </div>
-
+        {%for i in quizes%}
+        <script>
+          document.getElementById("copyButton{{forloop.counter}}").addEventListener("click", function() {
+              var valueToCopy = this.value;  // Get the value of the button
+              copyToClipboard(valueToCopy);  // Call the function to copy to clipboard
+              alert("Copied successfully " + valueToCopy);
+          });
+      
+          function copyToClipboard(text) {
+              navigator.clipboard.writeText(text).then(function() {
+                  console.log('Text copied to clipboard');
+              }, function(err) {
+                  console.error('Error copying text: ', err);
+              });
+          }
+      </script>
+      {%endfor%}
   {%endblock%}

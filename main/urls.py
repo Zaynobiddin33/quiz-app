@@ -19,6 +19,8 @@ urlpatterns = [
     path('register', views.register, name = 'register'),
 
     #excel
-    path('excel/<int:id>', views.excel_report, name = 'to_excel' )
+    path('excel/<int:id>', views.excel_report, name = 'to_excel' ),
+    #
+    path('active-deactive/<int:id>', views.activate_deactivate, name = 'act_deact')
 
 ]

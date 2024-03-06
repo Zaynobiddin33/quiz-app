@@ -8,6 +8,9 @@ class Quiz(models.Model):
     title = models.CharField(max_length=255)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     code = models.CharField(max_length=255, blank=True, unique=True)
+    start_date = models.DateTimeField(null = True)
+    limited_date = models.DateTimeField(null = True)
+    is_active = models.BooleanField(default = True)
 
     @property
     def all_questions(self):

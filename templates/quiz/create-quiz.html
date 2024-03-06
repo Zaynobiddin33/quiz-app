@@ -1,5 +1,6 @@
 {%extends 'base.html'%}
   {%block content%}
+  {%load static%}
   <div style="margin-top: 100px;"></div>
     <div class="container">
         <div class="row">
@@ -22,6 +23,17 @@
                         <input type="text" class="form-control" placeholder="Quiz name" name="title" required>
                     </div>
                     </div>
+                    <h6>give a time-period (if you don't, default values will be given) </h6>
+                    <div class="form-group">
+                        <label>available from:</label>
+                        <input type="datetime-local" class="form-control" name="start">
+                      </div>
+                    <div class="form-group mb-0">
+                    </div>
+                    <div class="form-group">
+                        <label>available to:</label>
+                        <input type="datetime-local" class="form-control" name="limit">
+                      </div>
                     <div class="form-group mb-0">
                     </div>
                 </div>
@@ -32,4 +44,5 @@
             </div>
         </div>
     </div>
+    <script src="{%static 'assets/bundles/bootstrap-timepicker/js/bootstrap-timepicker.min.js'%}"></script>
   {%endblock%}

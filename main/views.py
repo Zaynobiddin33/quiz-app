@@ -6,13 +6,16 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from openpyxl import Workbook
 from io import BytesIO
+from datetime import datetime, timedelta
+from django.utils import timezone
 
 # Create your views here.
 @login_required(login_url = 'dash:login')
 def main(request):
     quizes = Quiz.objects.filter(author = request.user)
     context = {
-        "quizes" : quizes
+        "quizes" : quizes,
+        'main': request.build_absolute_uri()
     }
     return render(request, 'main.html', context)
 
@@ -21,10 +24,23 @@ def main(request):
 def create_quiz(request):
     if request.method == 'POST':
         title = request.POST['title']
-        quiz = Quiz.objects.create(
-            title = title,
-            author = request.user
-        )
+        limit = request.POST['limit']
+        start = request.POST['start']
+        if not start:
+            start = timezone.now()
+        if limit:
+            quiz = Quiz.objects.create(
+                title = title,
+                author = request.user,
+                limited_date = limit,
+                start_date = start
+            )
+        else:
+            quiz = Quiz.objects.create(
+                title = title,
+                author = request.user,
+                start_date = start
+            )
         return redirect('dash:quest_create', quiz.id)
     return render(request, 'quiz/create-quiz.html')
 
@@ -194,3 +210,13 @@ def excel_report(request, id):
     response['Content-Disposition'] = 'attachment; filename="incomes.xlsx"'
     return response
 
+def activate_deactivate(request, id):
+    previous = request.META['HTTP_REFERER']
+    quiz = Quiz.objects.get(id = id)
+    if quiz.is_active == True:
+        quiz.is_active = False
+        quiz.save()
+    else:
+        quiz.is_active = True
+        quiz.save()
+    return redirect(previous)
