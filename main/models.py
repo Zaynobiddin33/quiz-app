@@ -2,14 +2,17 @@ import random, string
 
 from django.db import models
 from django.contrib.auth.models import User
+from ckeditor.fields import RichTextField 
 
 
 class Quiz(models.Model):
-    title = models.CharField(max_length=255)
+    # title = models.CharField(max_length=255)
+    title = RichTextField()
+
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     code = models.CharField(max_length=255, blank=True, unique=True)
-    start_date = models.DateTimeField(null = True)
-    limited_date = models.DateTimeField(null = True)
+    start_date = models.DateTimeField(null = True, blank = True)
+    limited_date = models.DateTimeField(null = True, blank = True)
     is_active = models.BooleanField(default = True)
 
     @property

@@ -1,4 +1,7 @@
 {%extends 'base.html'%}
+{%block title%}
+<title>Create quiz</title>
+{%endblock%}
   {%block content%}
   {%load static%}
   <div style="margin-top: 100px;"></div>
@@ -6,7 +9,8 @@
         <div class="row">
             <div class="col-lg-3 col-xl-3"></div>
             <div class="card col-xl-6 col-lg-6 " id="sample-login">
-                <form method="post"> {%csrf_token%}
+                <form method="post"> 
+                    {%csrf_token%}
                 <div class="card-header">
                     <h4>QUIZ</h4>
                 </div>
@@ -15,24 +19,20 @@
                     <div class="form-group">
                     <label>Name</label>
                     <div class="input-group">
-                        <div class="input-group-prepend">
-                        <div class="input-group-text">
-                            <i class="fa-solid fa-question"></i>
-                        </div>
-                        </div>
-                        <input type="text" class="form-control" placeholder="Quiz name" name="title" required>
+                        {{form.title}}
+                        {{form.media}}
                     </div>
                     </div>
                     <h6>give a time-period (if you don't, default values will be given) </h6>
                     <div class="form-group">
                         <label>available from:</label>
-                        <input type="datetime-local" class="form-control" name="start">
+                        {{form.start_date}}
                       </div>
                     <div class="form-group mb-0">
                     </div>
                     <div class="form-group">
                         <label>available to:</label>
-                        <input type="datetime-local" class="form-control" name="limit">
+                        {{form.limited_date}}
                       </div>
                     <div class="form-group mb-0">
                     </div>

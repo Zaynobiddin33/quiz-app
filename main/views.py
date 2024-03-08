@@ -8,24 +8,31 @@ from openpyxl import Workbook
 from io import BytesIO
 from datetime import datetime, timedelta
 from django.utils import timezone
+from . import forms
 
 # Create your views here.
 @login_required(login_url = 'dash:login')
 def main(request):
     quizes = Quiz.objects.filter(author = request.user)
+    current_url = (request.scheme + '://' + request.META['HTTP_HOST'] + request.META['PATH_INFO'])[:-1]
+    print(current_url)
     context = {
         "quizes" : quizes,
-        'main': request.build_absolute_uri()
+        'main': current_url
     }
     return render(request, 'main.html', context)
 
 
 @login_required(login_url = 'dash:login')
 def create_quiz(request):
+    form = forms.QuizForm()
+    context = {
+        'form' : form
+    }
     if request.method == 'POST':
         title = request.POST['title']
-        limit = request.POST['limit']
-        start = request.POST['start']
+        limit = request.POST['limited_date']
+        start = request.POST['start_date']
         if not start:
             start = timezone.now()
         if limit:
@@ -42,7 +49,7 @@ def create_quiz(request):
                 start_date = start
             )
         return redirect('dash:quest_create', quiz.id)
-    return render(request, 'quiz/create-quiz.html')
+    return render(request, 'quiz/create-quiz.html', context)
 
 
 @login_required(login_url = 'dash:login')

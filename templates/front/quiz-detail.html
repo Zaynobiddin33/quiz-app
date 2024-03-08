@@ -1,4 +1,7 @@
 {% extends 'base2.html' %}
+{%block title%}
+<title>Test section</title>
+{%endblock%}
   {% block content %}
   <section class="section m-5 d-block justify-content-center">
     <div class="section-body">
@@ -9,7 +12,7 @@
             <form action="{% url 'front:create_answers' quiz.code %}" method="post">
                 {% csrf_token %}
                 <div class="card-header">
-                  <h4>{{quiz.title}}</h4>
+                  <h4>{{quiz.title | safe}}</h4>
                 </div>
                 <div class="card-body">
                   <div>
