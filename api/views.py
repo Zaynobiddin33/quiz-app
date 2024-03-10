@@ -65,7 +65,7 @@ def question_detail(request, id):
     }
     return Response(context)
 
-api_view(["POST"])
+@api_view(["POST"])
 @csrf_exempt
 def create_answers(request, code):
     quiz = Quiz.objects.get(code=code)

@@ -16,7 +16,7 @@ class OptionSerializer(ModelSerializer):
         model = Option
         fields = "__all__"
 
-class QuiztakerSerializer(ModelSerializer):
+class QuizTakerSerializer(ModelSerializer):
     class Meta:
         model = QuizTaker
         fields = "__all__"
